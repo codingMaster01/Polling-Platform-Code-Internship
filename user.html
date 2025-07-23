@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="user.css">
+        <title>Polling for Newsletter District 11</title>
+        
+        <script type="module">
+            // Code To Integrate Firebase As Backend (Saves Questions Into Database)
+
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+            import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+          
+            const firebaseConfig = {
+                apiKey: "AIzaSyCS9TpVUkQpDpXHVpfC8VXparXSG30T_Ww",
+                authDomain: "polling-platform-district-11.firebaseapp.com",
+                projectId: "polling-platform-district-11",
+                storageBucket: "polling-platform-district-11.firebasestorage.app",
+                messagingSenderId: "20414616265",
+                appId: "1:20414616265:web:20cb7202449e356c233318"
+            };
+
+            const app = initializeApp(firebaseConfig);
+            const db = getFirestore(app);
+
+            window.db = db;
+            window.firestoreFns = { addDoc, getDocs, collection };
+        </script>
+
+    </head>
+    <body>
+        <!--Add main header and newsletter placeholder here-->
+
+        <h1 id="header">Polling Over District 11 Issues</h1>
+        <p>Let your local representative know how you feel regarding these important issues and allow her to make more informed decisions.</p>
+        <br>
+
+        <div id="ques_div1">
+            <h3 id="question">What do you think about this issue?</h3>
+            <button id="option_button1" class="button">I am in favor of passing this bill.</button>
+            <button id = "option_button2" class="button">I am against passing this bill.</button>
+        </div> 
+        
+        <script src="user.js"></script>
+
+    </body>
+</html>

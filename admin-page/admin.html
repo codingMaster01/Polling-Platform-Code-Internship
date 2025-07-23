@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="admin.css">
+        <title>Admin Page</title>
+
+        <script type="module">
+            // Code To Integrate Firebase As Backend (Saves Questions Into Database)
+
+    </head>
+
+    <body>
+        <h2>Add a New Question</h2>
+        
+        <form id = "questionForm">
+            <label>Question:</label><br>
+            <input type = "text" id = "question" required><br><br>
+
+            <label>Options (comma separated):</label><br>
+            <input type = "text" id = "options" required><br><br>
+
+            <button type = "submit">Add Question</button>
+        </form>
+
+        <script type="module">
+            // Get the form element
+            const form = document.getElementById('questionForm');
+
+            // Add an event listener for form submission
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault(); // Prevent the page from reloading
+
+                // Get the question text and trim whitespace
+                const question = document.getElementById('question').value.trim();
+
+                // Get the options, split by comma, and trim each option
+                const options = document.getElementById('options').value.split(',').map(o => o.trim());
+
+                // Get Firestore database and functions from the global window object
+                const { db, firestoreFns } = window;
+                const { addDoc, collection } = firestoreFns;
+
+                try {
+                    // Add the question as a new document in the 'polls' collection
+                    await addDoc(collection(db, 'polls'), { question, options });
+
+                    alert('Question added!');
+                    form.reset(); // Clear the form
+                } 
+                catch (err) {
+                    console.error('Error adding question:', err);
+                    alert('Error saving question.');
+                }
+            });
+        </script>
+
+        <script src="admin.js"></script>
+    </body>
+</html>
