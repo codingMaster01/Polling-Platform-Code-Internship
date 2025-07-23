@@ -9,6 +9,25 @@
         <script type="module">
             // Code To Integrate Firebase As Backend (Saves Questions Into Database)
 
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+            import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+          
+            const firebaseConfig = {
+                apiKey: "AIzaSyCS9TpVUkQpDpXHVpfC8VXparXSG30T_Ww",
+                authDomain: "polling-platform-district-11.firebaseapp.com",
+                projectId: "polling-platform-district-11",
+                storageBucket: "polling-platform-district-11.firebasestorage.app",
+                messagingSenderId: "20414616265",
+                appId: "1:20414616265:web:20cb7202449e356c233318"
+            };
+
+            const app = initializeApp(firebaseConfig);
+            const db = getFirestore(app);
+
+            window.db = db;
+            window.firestoreFns = { addDoc, getDocs, collection };
+            
+        </script>
     </head>
 
     <body>
