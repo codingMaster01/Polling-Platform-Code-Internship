@@ -25,7 +25,7 @@
             const db = getFirestore(app);
 
             window.db = db;
-            window.firestoreFns = { addDoc, getDocs, collection };
+            window.firestoreFns = { getDocs, collection };
         </script>
 
     </head>
@@ -36,13 +36,44 @@
         <p>Let your local representative know how you feel regarding these important issues and allow her to make more informed decisions.</p>
         <br>
 
-        <div id="ques_div1">
-            <h3 id="question">What do you think about this issue?</h3>
-            <button id="option_button1" class="button">I am in favor of passing this bill.</button>
-            <button id = "option_button2" class="button">I am against passing this bill.</button>
-        </div> 
+        <div id="pollContainer"></div>
+
         
-        <script src="user.js"></script>
+        <script type="module">
+            const {db: firestoreDB, firestoreFns } = window;
+            const { getDocs, collection } = firestoreFns;
+            const pollContainer = document.getElementById('pollContainer');
+            const querySnapshot = await getDocs(collection(db, 'polls'))
+
+            querySnapshot.forEach((doc) => {
+                const data = doc.data()
+                const question = data.question;
+                const options = data.options;
+
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question-block';
+
+                const questionText = document.createElement('h3');
+                questionText.textContent = question;
+                questionDiv.appendChild(questionText);
+
+                options.forEach(option => {
+                    const label = document.createElement('label');
+                    const radio = document.createElement('input');
+                    radio.type = 'radio';
+                    radio.name = question;
+                    radio.value = option;
+
+                    label.appendChild(radio);
+                    label.append(` ${option}`);
+                    questionDiv.appendChild(label);
+                    questionDiv.appendChild(document.createElement('br'));
+                });
+                   
+                pollContainer.appendChild(questionDiv);
+                    
+            });
+        </script>
 
     </body>
 </html>
