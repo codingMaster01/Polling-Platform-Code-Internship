@@ -5,12 +5,47 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="admin.css">
         <title>Admin Page</title>
+        <div id="loginContainer">
+        <h1>Enter Admin Password</h1>
+        <input
+            type="password"
+            id="passwordInput"
+            style="padding: 10px; margin: 10px; font-size: 35px; width: 250px;"
+        />
+        <button onclick="checkPassword()">
+            Login
+        </button>
+
+        </div>       
+          <script>
+            const correctHash = "4c29488e2d78d60d5f279366fe9b2cb2348ab21f7cc397361d92ff26f910254f";
+            async function sha256(message) {
+            const msgBuffer = new TextEncoder().encode(message);
+            const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+            }
+
+            async function checkPassword() {
+            const input = document.getElementById("passwordInput").value;
+       
+            const inputHash = await sha256(input);
+            
+            if (inputHash === correctHash) {
+                document.getElementById("adminContent").style.display = "block";
+                document.getElementById("loginContainer").style.display = "none";               
+            } 
+            else {
+                alert("Access Denied");
+            }
+            }
+        </script>
 
         <script type="module">
             // Code To Integrate Firebase As Backend (Saves Questions Into Database)
 
             import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-            import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+            import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
           
             const firebaseConfig = {
                 apiKey: "AIzaSyCS9TpVUkQpDpXHVpfC8VXparXSG30T_Ww",
@@ -25,23 +60,94 @@
             const db = getFirestore(app);
 
             window.db = db;
-            window.firestoreFns = { addDoc, getDocs, collection };
+            window.firestoreFns = { addDoc, getDocs, collection, deleteDoc, doc };
             
         </script>
     </head>
 
     <body>
-        <h2>Add a New Question</h2>
-        
-        <form id = "questionForm">
-            <label>Question:</label><br>
-            <input type = "text" id = "question" required><br><br>
+        <div class="top-bar">
+            <h1>Welcome Representative Crystal Lett</h1>
+        </div>
+        <h4>On this page, you can create custom polling questions with multiple answer options, giving you full control over the content. You also have the ability to delete any questions you no longer need. Best of all, you can view polling results in real time as responses are submitted, making it easy to track opinions instantly. You may need to reload in order to see updates!</h4>
+        <div id = "adminContent" style = "display: none;">
+            
+            <div id='form-container'>
+                <h1 class="main-header">Add a New Question</h1>
+                <form id = "questionForm">
+                    <label>Question</label><br>
+                    <textarea id="question" rows="2" required style="resize: vertical;"></textarea>
+                    <br><br>
 
-            <label>Options (comma separated):</label><br>
-            <input type = "text" id = "options" required><br><br>
+                    <label>Answer Options (Comma Separated)</label><br>
+                    <textarea id="options" rows="2" required style="resize: vertical;"></textarea> 
+                    <br><br>
 
-            <button type = "submit">Add Question</button>
-        </form>
+                    <button id="addQuestionButton" type = "submit">Add Question</button>
+                </form>
+            </div>
+            <br>
+            <br>
+            
+            <h1 class="main-header">Current Questions</h1>
+            <div id="questionContainer"></div>
+
+        </div>
+
+        <script type="module">
+            import { getDocs, collection, addDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+            const { db: firestoreDB } = window;
+            const questionContainer = document.getElementById('questionContainer');
+
+            const querySnapshot = await getDocs(collection(firestoreDB, 'polls'));
+
+            querySnapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                const question = data.question;
+                const options = data.options;
+
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question-block';
+
+                const questionText = document.createElement('h2');
+                questionText.class = 'current-ques-head';
+                questionText.textContent = question;
+                questionDiv.appendChild(questionText);
+                const ul = document.createElement('ul');
+
+                Object.entries(options).forEach(([option, count]) => {
+                    const li = document.createElement('li');
+                    li.textContent = `Option: ${option} / Votes: ${count} `;
+                    ul.appendChild(li);
+                });
+
+                questionDiv.appendChild(ul);
+
+                const delButton = document.createElement("button");
+                delButton.textContent = 'Delete';
+                delButton.className = 'delete-button';
+                delButton.style.marginTop = '10px';
+                delButton.addEventListener('click', async () => {
+                    if (confirm('Are you sure you want to delete this question?')){
+                        try {
+                            const { deleteDoc, doc } = window.firestoreFns;
+                            await deleteDoc(doc(firestoreDB, 'polls', docSnap.id));
+                            alert('Question deleted');
+                            questionDiv.remove();
+                        } catch (err) {
+                            console.error('Error deleting document:', err);
+                            alert('Failed to delete the question.');
+                        }
+                    }
+
+                });
+
+                questionDiv.appendChild(delButton);
+                questionContainer.appendChild(questionDiv);
+                questionContainer.appendChild(document.createElement('br'));
+            });
+        </script>
 
         <script type="module">
             // Get the form element
@@ -55,7 +161,12 @@
                 const question = document.getElementById('question').value.trim();
 
                 // Get the options, split by comma, and trim each option
-                const options = document.getElementById('options').value.split(',').map(o => o.trim());
+                const optionList = document.getElementById('options').value.split(',').map(o => o.trim());
+
+                const options = {};
+                optionList.forEach(option => {
+                    options[option] = 0;
+                })
 
                 // Get Firestore database and functions from the global window object
                 const { db, firestoreFns } = window;
@@ -74,6 +185,5 @@
                 }
             });
         </script>
-
     </body>
 </html>

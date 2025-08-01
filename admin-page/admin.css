@@ -1,50 +1,192 @@
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f7f7f7;
+body, html {
+  overflow-x: hidden;
   margin: 0;
-  padding: 40px;
+  padding: 0;
 }
 
-.container {
-  max-width: 500px;
-  margin: auto;
-  background-color: white;
-  padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+body {
+  font-family: Big Caslon;
+  font-family: 'Helvetica', sans-serif;
+  background: url("/images/back.jpeg");
+  background-size: cover;
+  background-size: 100%;
+  width: 100vw;
 }
 
-h2 {
+h4 {
+  font-family: Big Caslon;
+  margin: auto;  
+  font-size: 30px;
   text-align: center;
-  color: #333;
+  margin-bottom: 50px;
+  width: 75vw;
 }
 
-label {
-  display: block;
-  margin-top: 20px;
-  font-weight: bold;
+h1 {
+  font-family: Big Caslon;
+  display: flex;
+  justify-content: center;
+  margin: 2rem;
+  text-align: center;
 }
 
-input[type="text"] {
+.top-bar {
+  height: 150px;
+  font-family: Big Caslon;
+  margin-bottom: 70px;
   width: 100%;
-  padding: 10px;
-  margin-top: 5px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-button {
-  margin-top: 25px;
-  width: 100%;
-  padding: 12px;
-  background-color: #007bff;
+  background-color: #002752; /* Dark blue */
   color: white;
-  border: none;
-  font-size: 16px;
-  border-radius: 4px;
+  font-size: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 30px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.main-header{
+  font-size: 2.5em;
+}
+
+label{
+  font-size: 1.5em;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+}
+
+textarea{
+  display: block;
+  margin: auto;
+  width: 45vw;
+  font-size: 1.5em;
+}
+
+
+#form-container{
+  background-color: rgb(255, 255, 255);
+  margin-bottom: 25px;
+  padding: 20px 25px;
+  border-radius: 10px;
+  box-shadow: 0 4px 17px rgba(0,0,0,0.07);
+  transition: transform 0.2s ease-in-out;
+  width: 50%;
+  margin: auto;
+}
+
+#questionForm{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#addQuestionButton{
+  height: 4vw;
+  width: 20vw;
+  border-radius: 10px;
+  font-size: 1.5em;
+  background-color: #002752;
+  color: white;
+  border-width: 1px;
+  margin-bottom: 10px;
+}
+
+#addQuestionButton:hover{
+   background-color: #0056b3;
+   scale: 1.1;
+   cursor: pointer;
+}
+
+.question-block{
+  background-color: rgb(255, 255, 255);
+  margin-bottom: 10px;
+  padding: 20px 25px;
+  border-radius: 10px;
+  box-shadow: 0 4px 17px rgba(0,0,0,0.07);
+  transition: transform 0.2s ease-in-out;
+  width: 50%;
+  margin: auto;
+  display:flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+ul{
+  margin-top: 5px;
+  list-style-type: none;
+  text-align: center;
+  padding: 0;
+}
+
+li{
+  padding-left: 0;
+  padding-top: 1vw;
+  font-size: 1.5em;
+}
+
+.delete-button{
+  height: 3vw;
+  width: 10vw;
+  border-radius: 10px;
+  font-size: 1.2em;
+  background-color: #002752;
+  color: white;
+  border-width: 1px;
+  margin-bottom: 10px;
+}
+
+.delete-button:hover{
+  background-color: #0056b3;
+  scale: 1.1;
   cursor: pointer;
 }
 
-button:hover {
-  background-color: #0056b3;
+#loginContainer {
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #f2f2f2;
+  z-index: 9999;
+  background: url(/images/backgr-modified.jpg);
+  background-size: cover;
+}
+
+#loginContainer h1 {
+  margin-bottom: 10px;
+  font-family: Big Caslon;
+  font-size: 60px;
+}
+
+#loginContainer input {
+  margin-top: 10px;
+  border-radius: 10px;
+  font-family: Big Caslon;
+  font-size: 60px;
+}
+
+#loginContainer button {
+  background-color: white;
+  border-radius: 10px;
+  font-family: Big Caslon;
+  padding: 10px 20px;
+  font-size: 30px;
+  width: 300px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+#loginContainer button:hover {
+  background-color: lightgray;
+  border-radius: 10px;
+  font-family: Big Caslon;
+  padding: 10px 20px;
+  font-size: 30px;
+  width: 300px;
+  cursor: pointer;
+  margin-top: 10px;
 }

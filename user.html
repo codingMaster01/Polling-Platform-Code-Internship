@@ -20,7 +20,7 @@
                 messagingSenderId: "20414616265",
                 appId: "1:20414616265:web:20cb7202449e356c233318"
             };
-
+                                                                                    
             const app = initializeApp(firebaseConfig);
             const db = getFirestore(app);
 
@@ -30,23 +30,30 @@
 
     </head>
     <body>
+        <div class="top-bar">
+            <h2>Ohio State Representative Crystal Lett</h2>
+            <!--<img src="your-logo.png" alt="Logo" class="top-bar-logo" /> -->
+        </div>
         <!--Add main header and newsletter placeholder here-->
 
-        <h1 id="header">Polling Over District 11 Issues</h1>
-        <p>Let your local representative know how you feel regarding these important issues and allow her to make more informed decisions.</p>
+        <h1 id="header">Polling Over District 11 Bill / Issues</h1>
+        <p>Use this platform to share your thoughts and opinions on key community and national issues. By voicing your perspective, you empower your local representative to better understand the needs of her constituents and make more informed, impactful decisions on your behalf.</p>
         <br>
 
         <div id="pollContainer"></div>
+        <br>
+        <button id="submitBtn">Submit</button>
 
-        
         <script type="module">
-            const {db: firestoreDB, firestoreFns } = window;
-            const { getDocs, collection } = firestoreFns;
+            import { getDocs, collection } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+            const { db: firestoreDB } = window;
             const pollContainer = document.getElementById('pollContainer');
-            const querySnapshot = await getDocs(collection(db, 'polls'))
+
+            const querySnapshot = await getDocs(collection(firestoreDB, 'polls'));
 
             querySnapshot.forEach((doc) => {
-                const data = doc.data()
+                const data = doc.data();
                 const question = data.question;
                 const options = data.options;
 
@@ -55,9 +62,10 @@
 
                 const questionText = document.createElement('h3');
                 questionText.textContent = question;
+                questionText.className = 'poll-question';
                 questionDiv.appendChild(questionText);
 
-                options.forEach(option => {
+                Object.keys(options).forEach(option => {
                     const label = document.createElement('label');
                     const radio = document.createElement('input');
                     radio.type = 'radio';
@@ -69,11 +77,49 @@
                     questionDiv.appendChild(label);
                     questionDiv.appendChild(document.createElement('br'));
                 });
-                   
-                pollContainer.appendChild(questionDiv);
-                    
-            });
-        </script>
 
+                pollContainer.appendChild(questionDiv);
+            });
+
+        </script>
+        
+
+        <script type="module">
+            import { doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+            const submitButton = document.getElementById("submitBtn");
+
+            submitButton.addEventListener("click", async () => {
+                const pollContainer = document.getElementById("pollContainer");
+                const questionDivs = pollContainer.querySelectorAll(".question-block");
+
+                for (let div of questionDivs) {
+                    const questionText = div.querySelector("h3").textContent;
+                    const selected = div.querySelector('input[type="radio"]:checked');
+                    if (!selected) continue;
+
+                    const selectedOption = selected.value;
+
+                   
+                    const querySnapshot = await firestoreFns.getDocs(firestoreFns.collection(db, "polls"));
+                    querySnapshot.forEach(async (docSnap) => {
+                        const data = docSnap.data();
+                        if (data.question === questionText) {
+                            const questionRef = doc(db, "polls", docSnap.id);
+                            await updateDoc(questionRef, {
+                                [`options.${selectedOption}`]: increment(1)
+                            });
+                        }
+                    });
+                }
+                alert("Responses have been recorded!");
+                const radios = document.querySelectorAll('input[type="radio"]');
+                radios.forEach(radio => {
+                    radio.checked = false;
+                });
+                
+            });
+     
+        </script>
     </body>
 </html>
