@@ -5,7 +5,7 @@ body, html {
 }
 
 body {
-  font-family: Big Caslon;
+  font-family: "Arial";
   font-family: 'Helvetica', sans-serif;
   background: url("images/back.jpeg");
   background-size: cover;
@@ -14,7 +14,7 @@ body {
 }
 
 h4 {
-  font-family: Big Caslon;
+  font-family: "Arial";
   margin: auto;  
   font-size: 30px;
   text-align: center;
@@ -23,7 +23,7 @@ h4 {
 }
 
 h1 {
-  font-family: Big Caslon;
+  font-family: "Arial";
   display: flex;
   justify-content: center;
   margin: 2rem;
@@ -32,7 +32,7 @@ h1 {
 
 .top-bar {
   height: 150px;
-  font-family: Big Caslon;
+  font-family: "Arial";
   margin-bottom: 70px;
   width: 100%;
   background-color: #002752; /* Dark blue */

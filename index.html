@@ -85,41 +85,84 @@
         
 
         <script type="module">
-            import { doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-            const submitButton = document.getElementById("submitBtn");
+    const submitButton = document.getElementById("submitBtn");
+    const STORAGE_KEY_VERSION = "lastVotedPollVersion";
 
-            submitButton.addEventListener("click", async () => {
-                const pollContainer = document.getElementById("pollContainer");
-                const questionDivs = pollContainer.querySelectorAll(".question-block");
+    // Get current poll version from Firestore
+    async function getCurrentPollVersion() {
+        const metaRef = doc(db, "meta", "meta");
 
-                for (let div of questionDivs) {
-                    const questionText = div.querySelector("h3").textContent;
-                    const selected = div.querySelector('input[type="radio"]:checked');
-                    if (!selected) continue;
+        const metaSnap = await getDoc(metaRef);
+        if (metaSnap.exists()) {
+            return metaSnap.data().version;
+        }
+        console.error("No poll version found in Firestore.");
+        return null;
+    }
 
-                    const selectedOption = selected.value;
+    // Check if user already voted on this poll version
+    async function checkVotingEligibility() {
+        const currentVersion = await getCurrentPollVersion();
+        const lastVotedVersion = localStorage.getItem(STORAGE_KEY_VERSION);
 
-                   
-                    const querySnapshot = await firestoreFns.getDocs(firestoreFns.collection(db, "polls"));
-                    querySnapshot.forEach(async (docSnap) => {
-                        const data = docSnap.data();
-                        if (data.question === questionText) {
-                            const questionRef = doc(db, "polls", docSnap.id);
-                            await updateDoc(questionRef, {
-                                [`options.${selectedOption}`]: increment(1)
-                            });
-                        }
+        if (currentVersion && lastVotedVersion === currentVersion) {
+            submitButton.disabled = true;
+            submitButton.textContent = "You’ve already voted on this poll";
+            return false;
+        }
+        submitButton.disabled = false;
+        submitButton.textContent = "Submit";
+        return true;
+    }
+
+    // Run eligibility check on page load
+    await checkVotingEligibility();
+
+    submitButton.addEventListener("click", async () => {
+        const canVote = await checkVotingEligibility();
+        if (!canVote) return;
+
+        const pollContainer = document.getElementById("pollContainer");
+        const questionDivs = pollContainer.querySelectorAll(".question-block");
+
+        for (let div of questionDivs) {
+            const questionText = div.querySelector("h3").textContent;
+            const selected = div.querySelector('input[type="radio"]:checked');
+            if (!selected) continue;
+
+            const selectedOption = selected.value;
+
+            const querySnapshot = await firestoreFns.getDocs(firestoreFns.collection(db, "polls"));
+            querySnapshot.forEach(async (docSnap) => {
+                const data = docSnap.data();
+                if (data.question === questionText) {
+                    const questionRef = doc(db, "polls", docSnap.id);
+                    await updateDoc(questionRef, {
+                        [`options.${selectedOption}`]: increment(1)
                     });
                 }
-                alert("Responses have been recorded!");
-                const radios = document.querySelectorAll('input[type="radio"]');
-                radios.forEach(radio => {
-                    radio.checked = false;
-                });
-                
             });
-     
-        </script>
+        }
+
+        // Save current poll version after voting
+        const currentVersion = await getCurrentPollVersion();
+        if (currentVersion) {
+            localStorage.setItem(STORAGE_KEY_VERSION, currentVersion);
+        }
+
+        alert("Responses have been recorded!");
+        submitButton.disabled = true;
+        submitButton.textContent = "You’ve already voted on this poll";
+
+        // Reset radio buttons
+        const radios = document.querySelectorAll('input[type="radio"]');
+        radios.forEach(radio => {
+            radio.checked = false;
+        });
+    });
+</script>
+
     </body>
 </html>

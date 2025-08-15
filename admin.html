@@ -45,7 +45,7 @@
             // Code To Integrate Firebase As Backend (Saves Questions Into Database)
 
             import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-            import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+            import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
           
             const firebaseConfig = {
                 apiKey: "AIzaSyCS9TpVUkQpDpXHVpfC8VXparXSG30T_Ww",
@@ -60,7 +60,7 @@
             const db = getFirestore(app);
 
             window.db = db;
-            window.firestoreFns = { addDoc, getDocs, collection, deleteDoc, doc };
+            window.firestoreFns = { addDoc, getDocs, collection, deleteDoc, doc, getDoc, setDoc };
             
         </script>
     </head>
@@ -154,36 +154,37 @@
             const form = document.getElementById('questionForm');
 
             // Add an event listener for form submission
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault(); // Prevent the page from reloading
+form.addEventListener('submit', async (e) => {
+    e.preventDefault(); // Prevent page reload
 
-                // Get the question text and trim whitespace
-                const question = document.getElementById('question').value.trim();
+    const question = document.getElementById('question').value.trim();
+    const optionList = document.getElementById('options').value.split(',').map(o => o.trim());
 
-                // Get the options, split by comma, and trim each option
-                const optionList = document.getElementById('options').value.split(',').map(o => o.trim());
+    const options = {};
+    optionList.forEach(option => {
+        options[option] = 0;
+    });
 
-                const options = {};
-                optionList.forEach(option => {
-                    options[option] = 0;
-                })
+    const { db, firestoreFns } = window;
+    const { addDoc, collection, doc, updateDoc, setDoc } = firestoreFns;
 
-                // Get Firestore database and functions from the global window object
-                const { db, firestoreFns } = window;
-                const { addDoc, collection } = firestoreFns;
+    try {
+        // Add new question
+        await addDoc(collection(db, 'polls'), { question, options });
 
-                try {
-                    // Add the question as a new document in the 'polls' collection
-                    await addDoc(collection(db, 'polls'), { question, options });
+        // Update the version in the "meta" document with ISO timestamp
+        const metaDocRef = doc(db, 'meta', 'meta'); // collection: meta, document ID: meta
+        await setDoc(metaDocRef, { version: new Date().toISOString() });
 
-                    alert('Question added!');
-                    form.reset(); // Clear the form
-                } 
-                catch (err) {
-                    console.error('Error adding question:', err);
-                    alert('Error saving question.');
-                }
-            });
+        alert('Question added and version updated!');
+        form.reset();
+    } catch (err) {
+        console.error('Error adding question or updating version:', err);
+        alert('Error saving question.');
+    }
+});
+
+
         </script>
     </body>
 </html>
